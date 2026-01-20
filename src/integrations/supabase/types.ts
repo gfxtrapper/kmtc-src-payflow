@@ -14,16 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      payments: {
+        Row: {
+          admission_number: string
+          amount: number
+          campus: string
+          created_at: string
+          full_name: string
+          id: string
+          mpesa_receipt_number: string | null
+          paid_at: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          phone_number: string
+          receipt_url: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          transaction_reference: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admission_number: string
+          amount?: number
+          campus: string
+          created_at?: string
+          full_name: string
+          id?: string
+          mpesa_receipt_number?: string | null
+          paid_at?: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          phone_number: string
+          receipt_url?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_reference?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admission_number?: string
+          amount?: number
+          campus?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          mpesa_receipt_number?: string | null
+          paid_at?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          phone_number?: string
+          receipt_url?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          transaction_reference?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          admission_number: string
+          avatar_url: string | null
+          campus: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          phone_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admission_number: string
+          avatar_url?: string | null
+          campus: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          phone_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admission_number?: string
+          avatar_url?: string | null
+          campus?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "student"
+      payment_method: "mpesa" | "card" | "bank_transfer"
+      payment_status: "pending" | "completed" | "failed" | "refunded"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +275,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "student"],
+      payment_method: ["mpesa", "card", "bank_transfer"],
+      payment_status: ["pending", "completed", "failed", "refunded"],
+    },
   },
 } as const
