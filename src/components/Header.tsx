@@ -1,12 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Shield } from "lucide-react";
+import { Menu, X, User, Shield, LogOut, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import kmtcLogo from "@/assets/kmtc-logo.png";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAdmin, loading, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsMenuOpen(false);
+  };
 
   const menuItems = [
     { name: "Home", href: "#home" },
@@ -48,14 +57,42 @@ export const Header = () => {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="outline" size="sm">
-              <User className="mr-2 h-4 w-4" />
-              Student Login
-            </Button>
-            <Button variant="admin" size="sm">
-              <Shield className="mr-2 h-4 w-4" />
-              Admin Panel
-            </Button>
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            ) : user ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  {user.email}
+                </span>
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button variant="admin" size="sm">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Panel
+                    </Button>
+                  </Link>
+                )}
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="outline" size="sm">
+                    <User className="mr-2 h-4 w-4" />
+                    Student Login
+                  </Button>
+                </Link>
+                <Link to="/admin">
+                  <Button variant="admin" size="sm">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin Panel
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -82,14 +119,42 @@ export const Header = () => {
                 </a>
               ))}
               <div className="flex flex-col space-y-2 pt-3 border-t">
-                <Button variant="outline" size="sm" className="justify-start">
-                  <User className="mr-2 h-4 w-4" />
-                  Student Login
-                </Button>
-                <Button variant="admin" size="sm" className="justify-start">
-                  <Shield className="mr-2 h-4 w-4" />
-                  Admin Panel
-                </Button>
+                {loading ? (
+                  <div className="flex items-center justify-center py-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : user ? (
+                  <>
+                    <p className="px-3 text-sm text-muted-foreground">{user.email}</p>
+                    {isAdmin && (
+                      <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="admin" size="sm" className="w-full justify-start">
+                          <Shield className="mr-2 h-4 w-4" />
+                          Admin Panel
+                        </Button>
+                      </Link>
+                    )}
+                    <Button variant="outline" size="sm" className="justify-start" onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full justify-start">
+                        <User className="mr-2 h-4 w-4" />
+                        Student Login
+                      </Button>
+                    </Link>
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="admin" size="sm" className="w-full justify-start">
+                        <Shield className="mr-2 h-4 w-4" />
+                        Admin Panel
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>
