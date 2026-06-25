@@ -129,3 +129,10 @@ All colors MUST be HSL for proper theming
     @apply bg-background text-foreground;
   }
 }
+@media print {
+  body * { visibility: hidden !important; }
+  #printable-receipt, #printable-receipt * { visibility: visible !important; }
+  #printable-receipt {
+    position: absolute; left: 0; top: 0; width: 100%;
+  }
+}
