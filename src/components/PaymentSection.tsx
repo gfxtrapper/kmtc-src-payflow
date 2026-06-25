@@ -4,10 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Smartphone, Building2, Receipt, CheckCircle, AlertCircle, Users, Shield } from "lucide-react";
+import { CreditCard, Smartphone, Building2, Receipt, CheckCircle, AlertCircle, Users, Shield, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export const PaymentSection = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     admissionNumber: "",
@@ -31,6 +38,36 @@ export const PaymentSection = () => {
   };
 
   const isFormValid = Object.values(formData).every(value => value.trim() !== "");
+
+  const handlePay = async () => {
+    if (!user) {
+      toast.error("Please sign in to continue");
+      navigate("/auth");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("paystack-initialize", {
+        body: {
+          fullName: formData.fullName,
+          admissionNumber: formData.admissionNumber,
+          campus: formData.campus,
+          phoneNumber: formData.phoneNumber,
+          paymentMethod: formData.paymentMethod,
+          email: user.email,
+        },
+      });
+      if (error) throw error;
+      if (data?.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        throw new Error("No authorization URL returned");
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Failed to initialize payment");
+      setLoading(false);
+    }
+  };
 
   return (
     <section id="payment" className="py-16 bg-muted/30">
@@ -142,10 +179,11 @@ export const PaymentSection = () => {
                   variant="payment" 
                   size="lg" 
                   className="w-full mt-6"
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || loading}
+                  onClick={handlePay}
                 >
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Pay Ksh 1,500 Now
+                  {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <CreditCard className="mr-2 h-5 w-5" />}
+                  {loading ? "Redirecting..." : "Pay Ksh 1,500 Now"}
                 </Button>
               </CardContent>
             </Card>
